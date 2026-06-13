@@ -81,6 +81,11 @@ export default function Home() {
   const [serverLatency, setServerLatency] = useState<number | null>(null);
   const [networkLatency, setNetworkLatency] = useState<number | null>(null);
   const [connectionError, setConnectionError] = useState(false);
+  
+  // Real-time backend battery metrics states
+  const [backendRecommendations, setBackendRecommendations] = useState<string[]>([]);
+  const [backendWarnings, setBackendWarnings] = useState<string[]>([]);
+  const [projectedDecayCurve, setProjectedDecayCurve] = useState<{cycles: number; projected_soh: number}[]>([]);
 
   // 1. Authenticate with seeded credentials when API Connection is toggled on
   useEffect(() => {
@@ -286,6 +291,51 @@ export default function Home() {
           if (resData.thermal_anomaly_detected) {
             addAlert("danger", "CRITICAL ALERT (API): SNN Anomaly Detected! Rapid cell temperature elevation and current imbalance. Battery shutoff recommended.");
           }
+
+          // Fetch status to sync membrane potential
+          const statusRes = await fetch("http://127.0.0.1:8000/api/v1/battery/BAT-NEURO-901/status", {
+            headers: {
+              "Authorization": `Bearer ${apiToken}`,
+            }
+          });
+          if (statusRes.ok) {
+            const statusData = await statusRes.json();
+            setMembranePotential(statusData.membrane_potential);
+          }
+
+          // Fetch health & predictions
+          const healthRes = await fetch("http://127.0.0.1:8000/api/v1/battery/BAT-NEURO-901/health", {
+            headers: {
+              "Authorization": `Bearer ${apiToken}`,
+            }
+          });
+          if (healthRes.ok) {
+            const healthData = await healthRes.json();
+            setSoh(healthData.state_of_health);
+          }
+
+          const predRes = await fetch("http://127.0.0.1:8000/api/v1/battery/BAT-NEURO-901/predictions", {
+            headers: {
+              "Authorization": `Bearer ${apiToken}`,
+            }
+          });
+          if (predRes.ok) {
+            const predData = await predRes.json();
+            setRul(predData.predicted_rul);
+            setProjectedDecayCurve(predData.projected_decay_curve);
+          }
+
+          // Fetch recommendations
+          const recRes = await fetch("http://127.0.0.1:8000/api/v1/battery/BAT-NEURO-901/recommendations", {
+            headers: {
+              "Authorization": `Bearer ${apiToken}`,
+            }
+          });
+          if (recRes.ok) {
+            const recData = await recRes.json();
+            setBackendRecommendations(recData.recommendations);
+            setBackendWarnings(recData.warnings);
+          }
         } catch (err) {
           console.error(err);
           setConnectToAPI(false);
@@ -355,6 +405,15 @@ export default function Home() {
   // Helper safety JSON stringify for payload
   const jsonStringifySafe = (obj: any): string => {
     return JSON.stringify(obj);
+  };
+
+  const getBackendDecayPath = (): string => {
+    if (!projectedDecayCurve || projectedDecayCurve.length === 0) return "";
+    return projectedDecayCurve.map((pt, idx) => {
+      const x = 40 + (pt.cycles / 1500) * 440;
+      const y = 15 + (100 - pt.projected_soh) * 4.5;
+      return `${idx === 0 ? "M" : "L"} ${x} ${y}`;
+    }).join(" ");
   };
 
   const addAlert = (type: "warning" | "danger" | "info", message: string) => {
@@ -829,24 +888,36 @@ export default function Home() {
                       <text x="260" y="185" fill="var(--muted)" fontSize="9" fontFamily="monospace">750 cycles</text>
                       <text x="440" y="185" fill="var(--muted)" fontSize="9" fontFamily="monospace">1500 cycles</text>
 
-                      {/* Degradation Curve - Normal */}
-                      <path
-                        d="M 40 15 Q 260 90 480 150"
-                        fill="none"
-                        stroke="var(--primary)"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                      
-                      {/* Degradation Curve - High Current / Fast Charge */}
-                      <path
-                        d="M 40 15 Q 200 110 480 178"
-                        fill="none"
-                        stroke="var(--danger)"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeDasharray="4"
-                      />
+                      {connectToAPI && projectedDecayCurve.length > 0 ? (
+                        <path
+                          d={getBackendDecayPath()}
+                          fill="none"
+                          stroke="var(--primary)"
+                          strokeWidth="3.5"
+                          strokeLinecap="round"
+                        />
+                      ) : (
+                        <>
+                          {/* Degradation Curve - Normal */}
+                          <path
+                            d="M 40 15 Q 260 90 480 150"
+                            fill="none"
+                            stroke="var(--primary)"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                          />
+                          
+                          {/* Degradation Curve - High Current / Fast Charge */}
+                          <path
+                            d="M 40 15 Q 200 110 480 178"
+                            fill="none"
+                            stroke="var(--danger)"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeDasharray="4"
+                          />
+                        </>
+                      )}
 
                       {/* Current Cycle Marker */}
                       {chargeCycles && (
@@ -931,39 +1002,70 @@ export default function Home() {
                   <h3 className="text-base font-bold">Recommended preservation strategies</h3>
                   
                   <div className="space-y-3">
-                    
-                    {temperature > 35.0 && (
-                      <div className="flex gap-3 bg-danger/10 text-danger border border-danger/20 p-4 rounded-xl text-xs">
-                        <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <div>
-                          <strong className="block font-semibold mb-1">Cooling phase recommended</strong>
-                          Cell temperature is elevated ({temperature}°C). Restrict fast charging current to prevent electrolyte breakdown.
+                    {connectToAPI ? (
+                      <>
+                        {backendWarnings.map((warning, idx) => (
+                          <div key={`w-${idx}`} className="flex gap-3 bg-danger/10 text-danger border border-danger/20 p-4 rounded-xl text-xs">
+                            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div>
+                              <strong className="block font-semibold mb-1">Safety Alert</strong>
+                              {warning}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {backendRecommendations.map((rec, idx) => (
+                          <div key={`r-${idx}`} className="flex gap-3 bg-muted-light p-4 rounded-xl text-xs">
+                            <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                              <strong className="block font-semibold mb-1">Preservation Suggestion</strong>
+                              {rec}
+                            </div>
+                          </div>
+                        ))}
+                        {backendRecommendations.length === 0 && backendWarnings.length === 0 && (
+                          <span className="text-xs text-muted">Awaiting backend analysis...</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {temperature > 35.0 && (
+                          <div className="flex gap-3 bg-danger/10 text-danger border border-danger/20 p-4 rounded-xl text-xs">
+                            <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div>
+                              <strong className="block font-semibold mb-1">Cooling phase recommended</strong>
+                              Cell temperature is elevated ({temperature}°C). Restrict fast charging current to prevent electrolyte breakdown.
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex gap-3 bg-muted-light p-4 rounded-xl text-xs">
+                          <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <strong className="block font-semibold mb-1">Charge Limiting (80% SOC cap)</strong>
+                            Enabling the 80% charge limit is projected to extend the Remaining Useful Life from **{rul}** to **{rul + 450} cycles**, slowing active cathode erosion.
+                          </div>
                         </div>
-                      </div>
+
+                        <div className="flex gap-3 bg-muted-light p-4 rounded-xl text-xs">
+                          <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <div>
+                            <strong className="block font-semibold mb-1">Constant-Voltage absorption phase optimize</strong>
+                            High-current charging was sustained for {chargeCycles > 200 ? "42" : "28"} cycles. Transitioning into CV (constant-voltage) mode earlier is recommended to reduce grid lattice stresses.
+                          </div>
+                        </div>
+                      </>
                     )}
-
-                    <div className="flex gap-3 bg-muted-light p-4 rounded-xl text-xs">
-                      <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div>
-                        <strong className="block font-semibold mb-1">Charge Limiting (80% SOC cap)</strong>
-                        Enabling the 80% charge limit is projected to extend the Remaining Useful Life from **{rul}** to **{rul + 450} cycles**, slowing active cathode erosion.
-                      </div>
-                    </div>
-
-                    <div className="flex gap-3 bg-muted-light p-4 rounded-xl text-xs">
-                      <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <div>
-                        <strong className="block font-semibold mb-1">Constant-Voltage absorption phase optimize</strong>
-                        High-current charging was sustained for {chargeCycles > 200 ? "42" : "28"} cycles. Transitioning into CV (constant-voltage) mode earlier is recommended to reduce grid lattice stresses.
-                      </div>
-                    </div>
-
                   </div>
                 </div>
 

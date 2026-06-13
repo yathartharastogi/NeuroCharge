@@ -135,6 +135,25 @@ class PredictionEngine:
             f"Took {execution_time:.2f}ms"
         )
 
+        # Persist prediction to SQLite database
+        try:
+            from app.db.database import engine
+            from app.models.prediction import BatteryPrediction
+            from sqlmodel import Session
+            
+            with Session(engine) as db:
+                prediction_record = BatteryPrediction(
+                    battery_id=battery_id,
+                    predicted_soh=predicted_soh,
+                    predicted_rul=predicted_rul,
+                    inference_latency_ms=execution_time
+                )
+                db.add(prediction_record)
+                db.commit()
+                logger.info(f"[Prediction Engine] Persisted prediction for {battery_id} to database.")
+        except Exception as e:
+            logger.error(f"[Prediction Engine] Failed to persist prediction: {e}")
+
         return {
             "battery_id": battery_id,
             "predicted_soh": predicted_soh,

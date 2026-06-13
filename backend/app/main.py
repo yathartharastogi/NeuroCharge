@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.endpoints import telemetry, auth
+from app.api.endpoints import telemetry, auth, battery
 from app.db.database import create_db_and_tables
 
 # Configure logging format to emphasize latency tracking and neuromorphic events
@@ -18,6 +18,7 @@ logger = logging.getLogger("neurocharge")
 from sqlmodel import Session, select
 from app.db.database import create_db_and_tables, engine
 from app.models.user import User
+from app.models.prediction import BatteryPrediction
 from app.core.security import get_password_hash
 
 @asynccontextmanager
@@ -83,6 +84,7 @@ async def latency_monitoring_middleware(request: Request, call_next):
 # Include endpoint routes
 app.include_router(auth.router, prefix=settings.API_V1_STR, tags=["auth"])
 app.include_router(telemetry.router, prefix=settings.API_V1_STR, tags=["telemetry"])
+app.include_router(battery.router, prefix=f"{settings.API_V1_STR}/battery", tags=["battery"])
 
 @app.get("/", tags=["health"])
 async def root():
