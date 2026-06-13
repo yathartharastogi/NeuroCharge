@@ -24,6 +24,7 @@ interface AlertLog {
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("realtime");
   const [mounted, setMounted] = useState(false);
+  const [view, setView] = useState<"landing" | "dashboard">("landing");
 
   useEffect(() => {
     setMounted(true);
@@ -458,6 +459,115 @@ export default function Home() {
     }
   ];
 
+  if (view === "landing") {
+    return (
+      <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300 selection:bg-primary/20">
+        
+        {/* Navigation Bar */}
+        <header className="sticky top-0 z-50 w-full border-b border-card-border bg-background/85 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("landing")}>
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm tracking-wider">
+              NC
+            </div>
+            <div>
+              <h1 className="font-bold text-lg leading-tight tracking-tight">NeuroCharge</h1>
+              <span className="text-3xs text-muted font-medium uppercase tracking-widest block">SNN Platform</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setView("dashboard")}
+            className="px-5 py-2.5 bg-primary text-primary-foreground hover:bg-primary/95 text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer animate-fade-up delay-100"
+          >
+            Enter Dashboard
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </header>
+
+        {/* Hero Section */}
+        <main className="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto px-6 py-16 text-center space-y-8">
+          <div className="animate-fade-up delay-100 start-hidden">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-muted-light text-primary border border-card-border">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse"></span>
+              Neuromorphic EV Intelligence
+            </span>
+          </div>
+
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-none text-foreground max-w-3xl animate-fade-up delay-200 start-hidden">
+            Neuromorphic Battery Intelligence
+          </h2>
+
+          <p className="text-sm md:text-base text-muted max-w-2xl leading-relaxed animate-fade-up delay-300 start-hidden">
+            A brain-inspired EV battery management platform that continuously learns charging behavior, predicts capacity degradation, and instantly detects thermal runaway anomalies using stateful Spiking Neural Networks.
+          </p>
+
+          <div className="animate-fade-up delay-300 start-hidden flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+            <button
+              onClick={() => setView("dashboard")}
+              className="px-6 py-3.5 bg-primary text-primary-foreground hover:bg-primary/95 text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              Enter Real-Time Dashboard
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Core Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-16 animate-fade-up delay-400 start-hidden">
+            
+            {/* Card 1: SNN Engine */}
+            <div className="bg-card border border-card-border p-6 rounded-2xl text-left hover:-translate-y-0.5 hover:shadow-sm transition-all duration-300 space-y-4">
+              <div className="h-10 w-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-base">Spiking Neural Network Engine</h3>
+              <p className="text-xs text-muted leading-relaxed font-normal">
+                Simulates biological neural dynamics using a stateful Leaky Integrate-and-Fire (LIF) model to track complex, dynamic temporal characteristics of battery chemistry.
+              </p>
+            </div>
+
+            {/* Card 2: Thermal Anomaly Engine */}
+            <div className="bg-card border border-card-border p-6 rounded-2xl text-left hover:-translate-y-0.5 hover:shadow-sm transition-all duration-300 space-y-4">
+              <div className="h-10 w-10 bg-danger/10 text-danger rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-base">Thermal Anomaly Engine</h3>
+              <p className="text-xs text-muted leading-relaxed font-normal">
+                Applies optimized delta-modulation event encoding to continuous telemetry, checking for safety anomalies in under 1 second to prevent critical runaway risk.
+              </p>
+            </div>
+
+            {/* Card 3: Hybrid LSTM Health Predictor */}
+            <div className="bg-card border border-card-border p-6 rounded-2xl text-left hover:-translate-y-0.5 hover:shadow-sm transition-all duration-300 space-y-4">
+              <div className="h-10 w-10 bg-accent/10 text-accent rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-base">Adaptive Health Projections</h3>
+              <p className="text-xs text-muted leading-relaxed font-normal">
+                Runs background LSTM predictive intelligence on aggregated neural outputs to estimate exact capacity retention, State of Health (SOH), and Remaining Useful Life (RUL).
+              </p>
+            </div>
+
+          </div>
+        </main>
+
+        {/* Unified Footer */}
+        <footer className="w-full border-t border-card-border py-6 text-center text-3xs text-muted font-medium uppercase tracking-widest animate-fade-up delay-400">
+          &copy; {new Date().getFullYear()} NeuroCharge. All rights reserved.
+        </footer>
+
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 min-h-screen bg-background text-foreground transition-colors duration-300">
       
@@ -465,7 +575,10 @@ export default function Home() {
       <aside className="w-64 border-r border-card-border bg-card p-6 flex flex-col justify-between hidden md:flex">
         <div>
           {/* Platform Title */}
-          <div className="flex items-center gap-3 mb-8">
+          <div 
+            onClick={() => setView("landing")}
+            className="flex items-center gap-3 mb-8 cursor-pointer hover:opacity-80 transition-all"
+          >
             <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm tracking-wider">
               NC
             </div>
