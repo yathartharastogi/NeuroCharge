@@ -1,4 +1,4 @@
-# NeuroCharge ⚡
+# NeuroCharge
 
 NeuroCharge is a brain-inspired, deep-tech neuromorphic battery management and EV analytics platform. It implements stateful **Spiking Neural Network (SNN)** processing on battery cell telemetry to detect thermal runaway anomalies in under a second, while synchronizing physical parameters against a real-time **Digital Twin** ideal model and projecting capacity degradation using LSTM intelligence.
 
