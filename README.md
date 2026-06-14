@@ -20,10 +20,13 @@ NeuroCharge is a brain-inspired, deep-tech neuromorphic battery management and E
 - Computes **Remaining Useful Life (RUL)** in remaining charge cycles.
 - Compares normal degradation against fast-charge accelerated aging curves.
 
-### 4. Fully Animated Minimalist Dashboard
+### 4. Fully Animated Minimalist Dashboard & Multi-Section Landing Page
+- **Scroll-Reveal Layout**: Modern single-page landing site equipped with dynamic fade-ups triggered by an `IntersectionObserver` when entering the viewport.
+- **Anchor-Linked Fixed Navbar**: Translucent glassmorphic navbar supporting smooth scrolling to custom sections (**Features**, **Technology**, **About**).
 - **Hardware-Accelerated Staggers**: CSS Keyframe slide-ins for metrics cards to ensure smooth entry.
 - **`requestAnimationFrame` Counter Transitions**: Numeric counters count up fluidly from 0 to targets over 1200ms with a premium cubic-out easing curve.
 - **SVG ClipPath Mask Drawing**: Graph curves draw from left to right smoothly, bypassing path layout restrictions.
+- **Custom Interactive SVG Cell Simulation**: Dynamic, real-time animation depicting internal battery cylinders, neural spike activities, and energy/synaptic flow paths.
 
 ---
 
