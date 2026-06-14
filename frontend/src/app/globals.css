@@ -1,36 +1,24 @@
 @import "tailwindcss";
 
-/*
-  NeuroCharge — Deep-Tech Neuromorphic Blue Palette
-  brand-bg:      #F6FAFD  cool ice tint
-  brand-dark:    #0A1931  midnight navy — headings / bold values
-  brand-primary: #1A3D63  deep navy — buttons / active nav / chart lines
-  brand-muted:   #4A7FA7  steel blue — subtext / inactive states
-  brand-accent:  #B3CFE5  soft blue — progress tracks / badge fills
-*/
-
 @theme {
-  --color-brand-bg:      #F6FAFD;
-  --color-brand-dark:    #0A1931;
-  --color-brand-primary: #1A3D63;
-  --color-brand-muted:   #4A7FA7;
-  --color-brand-accent:  #B3CFE5;
-  --color-danger:        #c0392b;
-  --color-success:       #1a7a4a;
+  --color-brand-bg:      #080E1A;
+  --color-brand-dark:    #FFFFFF;
+  --color-brand-primary: #38BDF8;
+  --color-brand-muted:   #94A3B8;
+  --color-brand-accent:  #0F172A;
+  --color-danger:        #EF4444;
+  --color-success:       #10B981;
 }
 
-/* ── Base ─────────────────────────────────────────────────────── */
 body {
-  background-color: #F6FAFD;
-  color: #0A1931;
+  background-color: #080E1A;
+  color: #FFFFFF;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   background-image:
-    radial-gradient(ellipse 100% 55% at 80% -10%, rgba(26,61,99,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 10% 100%, rgba(179,207,229,0.12) 0%, transparent 55%);
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 10% 100%, rgba(15, 23, 42, 0.3) 0%, transparent 50%);
   background-attachment: fixed;
 }
-
-/* ── Animations ──────────────────────────────────────────────── */
 @keyframes fadeUp {
   0%   { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -71,12 +59,32 @@ body {
 .delay-stagger-3 { animation-delay: 180ms; }
 .delay-stagger-4 { animation-delay: 240ms; }
 .delay-stagger-5 { animation-delay: 300ms; }
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-/* ── Scrollbar ───────────────────────────────────────────────── */
-::-webkit-scrollbar             { width: 6px; }
-::-webkit-scrollbar-track       { background: #F6FAFD; }
-::-webkit-scrollbar-thumb       { background: #B3CFE5; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #4A7FA7; }
+.scroll-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-/* ── Selection ───────────────────────────────────────────────── */
-::selection { background: rgba(179,207,229,0.45); color: #0A1931; }
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080E1A;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #38BDF8;
+}
+
+::selection {
+  background: rgba(56, 189, 248, 0.2);
+  color: #FFFFFF;
+}

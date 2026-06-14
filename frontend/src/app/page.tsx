@@ -50,6 +50,23 @@ export default function Home() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (view !== "landing") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    const elements = document.querySelectorAll(".scroll-reveal");
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [view]);
+
   const [chargingState, setChargingState] = useState<ChargingState>("charging");
   const [fastCharge, setFastCharge] = useState(false);
   const [chargeLimit80, setChargeLimit80] = useState(false);
@@ -368,126 +385,161 @@ export default function Home() {
 
   const qaData = [
     {
-      q: "What is delta-modulation event encoding?",
-      a: "Delta-modulation converts continuous signals into discrete events (spikes). When a continuous parameter changes from its last reference level by more than a pre-defined threshold, it generates an UP (+1) or DOWN (-1) event and updates its reference. This mimics biological sensory receptors, minimizing data processing overhead and lowering latency to <5ms.",
+      q: "Electrolyte Degradation Physics",
+      a: "Neuromorphic models predict accelerated SEI layer formation at temperatures above 40°C. AI suggests maintaining cooler operation to extend electrolyte life.",
     },
     {
-      q: "How does the Leaky Integrate-and-Fire (LIF) model detect anomalies?",
-      a: "The LIF model simulates the membrane potential of a biological neuron. It continuously integrates incoming event spikes while slowly leaking potential over time. If a flurry of warning spikes arrives within a short window, the potential accumulates and crosses a threshold, instantly firing an anomaly trigger.",
+      q: "Lithium Plating Mechanisms",
+      a: "High currents at low temperatures trigger lithium plating on the graphite anode, reducing capacity. Dynamic charge limit capping protects grid boundaries.",
     },
     {
-      q: "Why does fast charging accelerate battery degradation?",
-      a: "Fast charging pushes higher currents into the cell, generating substantial Joule heating proportional to Current squared. High temperatures accelerate lithium plating, SEI layer growth, and mechanical cell cracking. Limiting fast charging extends cell cycle life considerably.",
+      q: "Thermal Drift Runaway Kinetics",
+      a: "Unchecked exothermic cell dynamics trigger self-sustaining thermal degradation cycles. Integrated LIF neurons detect temperature rates of change to trigger emergency coolants.",
     },
   ];
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   if (view === "landing") {
     return (
-      <div className="flex flex-col min-h-screen bg-brand-bg text-brand-dark">
-        <header className="sticky top-0 z-50 w-full border-b border-brand-accent bg-brand-bg/90 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+      <div className="flex flex-col min-h-screen bg-[#080E1A] text-white relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(56,189,248,0.08)_0%,transparent_40%),radial-gradient(circle_at_80%_60%,rgba(239,68,68,0.05)_0%,transparent_40%)] pointer-events-none" />
+
+        <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-[#1E293B] bg-[#080E1A]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("landing")}>
-            <div className="h-8 w-8 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold text-sm tracking-wider shadow">
+            <div className="h-8 w-8 rounded-full bg-[#1E293B] border border-brand-primary flex items-center justify-center text-brand-primary font-bold text-xs tracking-wider">
               NC
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-tight tracking-tight text-brand-dark">NeuroCharge</h1>
-              <span className="text-xs text-brand-muted font-medium uppercase tracking-widest block">SNN Platform</span>
+              <h1 className="font-bold text-sm leading-tight tracking-tight text-white uppercase">NeuroCharge SNN PLATFORM</h1>
             </div>
+          </div>
+          <div className="hidden md:flex items-center gap-8 text-xs font-semibold text-[#94A3B8]">
+            <span onClick={() => scrollToSection("features")} className="hover:text-[#38BDF8] cursor-pointer transition-all">Features</span>
+            <span onClick={() => scrollToSection("technology")} className="hover:text-[#38BDF8] cursor-pointer transition-all">Technology</span>
+            <span onClick={() => scrollToSection("about")} className="hover:text-[#38BDF8] cursor-pointer transition-all">About</span>
           </div>
           <button
             onClick={() => setView("dashboard")}
-            className="px-5 py-2.5 border border-brand-primary text-brand-primary hover:bg-brand-accent/20 text-xs font-semibold rounded-xl transition-all flex items-center gap-2 cursor-pointer"
+            className="px-5 py-2.5 bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8] text-white hover:text-[#38BDF8] text-xs font-bold uppercase rounded-lg transition-all shadow-[0_0_10px_rgba(56,189,248,0.05)] cursor-pointer"
           >
-            Enter Dashboard
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            Enter Dashboard &gt;
           </button>
         </header>
 
-        <main className="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto px-6 py-16 text-center space-y-8">
-          <div className="animate-fade-up delay-100 start-hidden">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-accent/30 text-brand-primary border border-brand-accent">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-primary animate-pulse" />
-              Neuromorphic EV Intelligence
-            </span>
-          </div>
+        <main className="flex-1 max-w-5xl mx-auto px-6 pt-32 pb-16 space-y-24 z-10 w-full">
+          <section className="flex flex-col items-center justify-center text-center space-y-8 min-h-[60vh]">
+            <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-none text-white uppercase max-w-3xl animate-fade-up delay-100 start-hidden">
+              The Future of Battery Intelligence
+            </h2>
 
-          <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-none text-brand-dark max-w-3xl animate-fade-up delay-200 start-hidden">
-            Neuromorphic Battery Intelligence
-          </h2>
+            <p className="text-sm md:text-base text-brand-muted max-w-2xl leading-relaxed animate-fade-up delay-200 start-hidden">
+              Next-generation neuromorphic battery management platform. Advanced SNN-driven analytics for optimized performance and longevity.
+            </p>
 
-          <p className="text-sm md:text-base text-brand-muted max-w-2xl leading-relaxed animate-fade-up delay-300 start-hidden">
-            A brain-inspired EV battery management platform that continuously learns charging behavior, predicts capacity degradation, and instantly detects thermal runaway anomalies using stateful Spiking Neural Networks.
-          </p>
+            <div className="animate-fade-up delay-300 start-hidden pt-4">
+              <button
+                onClick={() => setView("dashboard")}
+                className="px-8 py-3.5 bg-brand-bg border border-brand-primary text-white hover:bg-[#0F172A] text-sm font-bold uppercase rounded-lg transition-all shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:scale-[1.02] cursor-pointer"
+              >
+                Enter Platform &gt;
+              </button>
+            </div>
+          </section>
 
-          <div className="animate-fade-up delay-300 start-hidden flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <button
-              onClick={() => setView("dashboard")}
-              className="px-6 py-3.5 bg-brand-primary text-white hover:bg-brand-muted text-sm font-semibold rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer"
-            >
-              Enter Real-Time Dashboard
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-16 animate-fade-up delay-400 start-hidden">
-            <div className="bg-white border border-brand-primary/20 p-6 rounded-2xl text-left hover:-translate-y-[2px] hover:shadow-lg transition-all duration-300 space-y-4">
-              <div className="h-10 w-10 bg-brand-accent/30 text-brand-primary rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+          <section id="features" className="scroll-reveal space-y-8 pt-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-extrabold tracking-wider uppercase text-white">Features</h3>
+              <div className="h-1 w-12 bg-[#38BDF8] mx-auto mt-3" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+              <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] hover:-translate-y-1.5 transition-all duration-300 space-y-4 flex flex-col items-center">
+                <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
+                  <svg className="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-base text-white">Live Monitor</h4>
+                <p className="text-xs text-brand-muted leading-relaxed">
+                  Real-time SNN monitoring for voltage, temperature, and current spike detection.
+                </p>
               </div>
-              <h3 className="font-bold text-base text-brand-dark">Spiking Neural Network Engine</h3>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                Simulates biological neural dynamics using a stateful Leaky Integrate-and-Fire (LIF) model to track complex temporal characteristics of battery chemistry.
+
+              <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] hover:-translate-y-1.5 transition-all duration-300 space-y-4 flex flex-col items-center">
+                <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-base text-white">Predictive Twin</h4>
+                <p className="text-xs text-brand-muted leading-relaxed">
+                  AI-driven degradation modeling and simulation for precise lifetime prediction.
+                </p>
+              </div>
+
+              <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] hover:-translate-y-1.5 transition-all duration-300 space-y-4 flex flex-col items-center">
+                <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-base text-white">AI Preservation</h4>
+                <p className="text-xs text-brand-muted leading-relaxed">
+                  Smart SNN algorithms for proactive thermal management and charge optimization.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section id="technology" className="scroll-reveal space-y-8 pt-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-extrabold tracking-wider uppercase text-white">Understanding EV Battery Intelligence</h3>
+              <div className="h-1 w-12 bg-[#38BDF8] mx-auto mt-3" />
+            </div>
+            <div className="max-w-3xl mx-auto space-y-6 text-sm text-[#94A3B8] leading-relaxed text-center">
+              <p>
+                Spiking Neural Networks (SNNs) represent the vanguard of neuromorphic computing, mimicking the biology of human neural pathways to process battery sensor inputs as temporal spike events. By translating continuous telemetry—voltage shifts, current draws, and thermal spikes—into discrete delta-modulated triggers, the SNN model operates with near-zero latency. This stateful execution allows the system to run complex predictive algorithms at a fraction of the computational footprint required by traditional state-of-health processors.
+              </p>
+              <p>
+                This stateful monitoring is crucial for early anomaly detection, especially in high-stress charging cycles. By continuously integrating temporal spikes, the Leaky Integrate-and-Fire model identifies thermodynamic anomalies in under a second, stopping potential thermal runaway events before they escalate. Furthermore, these real-time calibration loops align the battery's active output with its digital twin, dynamically adapting charge limits and reducing grid lattice stresses to extend cycle longevity and vehicle health.
               </p>
             </div>
+          </section>
 
-            <div className="bg-white border border-brand-primary/20 p-6 rounded-2xl text-left hover:-translate-y-[2px] hover:shadow-lg transition-all duration-300 space-y-4">
-              <div className="h-10 w-10 bg-red-50 text-danger rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-base text-brand-dark">Thermal Anomaly Engine</h3>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                Applies optimized delta-modulation event encoding to continuous telemetry, checking for safety anomalies in under 1 second to prevent critical runaway risk.
+          <section id="about" className="scroll-reveal space-y-8 pt-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-extrabold tracking-wider uppercase text-white">About NeuroCharge</h3>
+              <div className="h-1 w-12 bg-[#38BDF8] mx-auto mt-3" />
+            </div>
+            <div className="max-w-3xl mx-auto space-y-6 text-sm text-[#94A3B8] leading-relaxed text-center">
+              <p>
+                NeuroCharge was founded on the mission to revolutionize energy storage analytics through neuromorphic computing. By bridging the gap between hardware battery management capabilities and stateful artificial intelligence, our platform delivers real-time prognostic safety checks and lifespan optimizations. We empower EV fleets, energy providers, and grid operators with deep-tech, SNN-driven insights to maximize efficiency, accelerate electrification, and secure long-term battery cell reliability.
               </p>
             </div>
-
-            <div className="bg-white border border-brand-primary/20 p-6 rounded-2xl text-left hover:-translate-y-[2px] hover:shadow-lg transition-all duration-300 space-y-4">
-              <div className="h-10 w-10 bg-brand-accent/30 text-brand-primary rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-base text-brand-dark">Adaptive Health Projections</h3>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                Runs background LSTM predictive intelligence to estimate capacity retention, State of Health (SOH), and Remaining Useful Life (RUL).
-              </p>
-            </div>
-          </div>
+          </section>
         </main>
 
-        <footer className="w-full border-t border-brand-accent py-6 text-center text-xs text-brand-muted font-medium uppercase tracking-widest">
-          &copy; {new Date().getFullYear()} NeuroCharge. All rights reserved.
+        <footer className="w-full border-t border-[#1E293B] py-6 text-center text-[10px] text-brand-muted font-medium uppercase tracking-widest z-10">
+          &copy; {new Date().getFullYear()} NEUROCHARGE. ALL RIGHTS RESERVED.
         </footer>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 min-h-screen bg-brand-bg text-brand-dark">
-      <aside className="w-64 border-r border-brand-accent bg-white p-6 flex-col justify-between hidden md:flex shadow-sm">
+    <div className="flex flex-1 min-h-screen bg-[#080E1A] text-white">
+      <aside className="w-64 border-r border-[#1E293B] bg-[#080E1A] p-6 flex-col justify-between hidden md:flex">
         <div>
           <div onClick={() => setView("landing")} className="flex items-center gap-3 mb-8 cursor-pointer hover:opacity-80 transition-all">
-            <div className="h-8 w-8 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold text-sm tracking-wider">NC</div>
+            <div className="h-8 w-8 rounded-full bg-[#1E293B] border border-brand-primary flex items-center justify-center text-brand-primary font-bold text-xs tracking-wider">NC</div>
             <div>
-              <h1 className="font-bold text-lg leading-tight tracking-tight text-brand-dark">NeuroCharge</h1>
-              <span className="text-xs text-brand-muted font-medium uppercase tracking-widest">SNN Platform</span>
+              <h1 className="font-bold text-sm leading-tight tracking-tight text-white">NeuroCharge</h1>
+              <span className="text-[10px] text-brand-muted font-medium uppercase tracking-widest">SNN Platform</span>
             </div>
           </div>
 
@@ -512,10 +564,10 @@ export default function Home() {
               <button
                 key={key}
                 onClick={() => setActiveTab(key as Tab)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-xs transition-all ${
                   activeTab === key
-                    ? "bg-brand-accent/30 text-brand-primary font-semibold"
-                    : "text-brand-muted hover:bg-brand-accent/20 hover:text-brand-dark"
+                    ? "bg-[#0F172A] text-white font-semibold border border-brand-primary/20 shadow-[0_0_10px_rgba(56,189,248,0.05)]"
+                    : "text-brand-muted hover:bg-[#0F172A]/50 hover:text-white"
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">{icon}</svg>
@@ -524,30 +576,30 @@ export default function Home() {
             ))}
           </nav>
 
-          <div className="mt-8 pt-6 border-t border-brand-accent space-y-3">
-            <span className="text-xs font-bold uppercase tracking-widest text-brand-muted block">Database Integration</span>
-            <div className="flex items-center justify-between bg-brand-accent/20 p-3.5 rounded-xl">
+          <div className="mt-8 pt-6 border-t border-[#1E293B] space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-muted block">Database Integration</span>
+            <div className="flex items-center justify-between bg-[#0F172A] border border-[#1E293B] p-3.5 rounded-xl">
               <div className="space-y-0.5">
-                <span className="text-xs font-semibold text-brand-dark block">Live API link</span>
-                <span className="text-xs text-brand-muted block">Persist records to SQL</span>
+                <span className="text-[10px] font-semibold text-white block">Live API link</span>
+                <span className="text-[9px] text-brand-muted block">Persist records to SQL</span>
               </div>
               <input
                 type="checkbox"
                 checked={connectToAPI}
                 disabled={isAuthenticating}
                 onChange={(e) => setConnectToAPI(e.target.checked)}
-                className="h-4 w-4 accent-brand-primary border-brand-accent rounded"
+                className="h-4 w-4 accent-brand-primary border-[#1E293B] rounded bg-[#080E1A]"
               />
             </div>
-            {isAuthenticating && <span className="text-xs text-brand-muted block animate-pulse font-semibold">Authenticating admin session...</span>}
-            {connectionError && <span className="text-xs text-danger block font-semibold">Connection failed: API down?</span>}
+            {isAuthenticating && <span className="text-[10px] text-brand-muted block animate-pulse font-semibold">Authenticating admin session...</span>}
+            {connectionError && <span className="text-[10px] text-danger block font-semibold">Connection failed: API down?</span>}
           </div>
         </div>
 
-        <div className="bg-brand-accent/20 rounded-xl p-4 text-xs space-y-3">
+        <div className="bg-[#0F172A] border border-[#1E293B] rounded-xl p-4 text-[10px] space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-brand-muted">Link Connection:</span>
-            <span className={`font-semibold flex items-center gap-1 ${connectToAPI ? "text-success" : "text-brand-muted"}`}>
+            <span className={`font-semibold flex items-center gap-1 ${connectToAPI ? "text-success" : "text-brand-primary"}`}>
               <span className={`h-1.5 w-1.5 rounded-full bg-current ${connectToAPI ? "animate-pulse" : ""}`} />
               {connectToAPI ? "API Streaming" : "Local Sim"}
             </span>
@@ -556,11 +608,11 @@ export default function Home() {
             <>
               <div className="flex justify-between font-mono">
                 <span className="text-brand-muted">API Latency:</span>
-                <span className="text-brand-dark">{serverLatency !== null ? `${serverLatency.toFixed(2)}ms` : "checking..."}</span>
+                <span className="text-white">{serverLatency !== null ? `${serverLatency.toFixed(2)}ms` : "checking..."}</span>
               </div>
               <div className="flex justify-between font-mono">
                 <span className="text-brand-muted">Roundtrip Lag:</span>
-                <span className="text-brand-dark">{networkLatency !== null ? `${networkLatency}ms` : "checking..."}</span>
+                <span className="text-white">{networkLatency !== null ? `${networkLatency}ms` : "checking..."}</span>
               </div>
             </>
           )}
@@ -571,31 +623,62 @@ export default function Home() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col p-4 md:p-8 space-y-6 overflow-y-auto">
-        <header className="flex justify-between items-center border-b border-brand-accent pb-4">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-brand-dark">EV Battery Intelligence</h2>
-            <p className="text-sm text-brand-muted">
-              Real-time neuromorphic analytics for LFP Battery Pack{" "}
-              <code className="bg-brand-accent/30 px-1.5 py-0.5 rounded text-brand-primary font-mono text-xs">BAT-NEURO-901</code>
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {runawayMode && (
-              <span className="bg-danger text-white px-3 py-1 rounded-full text-xs font-semibold uppercase animate-pulse">
-                Runaway Active
-              </span>
-            )}
+      <main className="flex-1 flex flex-col p-4 md:p-8 space-y-6 overflow-y-auto bg-[#080E1A]">
+        {activeTab === "realtime" && (
+          <header className="flex justify-between items-center border-b border-[#1E293B] pb-4">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-white">Live Monitor - Neuromorphic Battery Management</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              {runawayMode && (
+                <span className="bg-danger text-white px-3 py-1 rounded-full text-[10px] font-semibold uppercase animate-pulse">
+                  Runaway Active
+                </span>
+              )}
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 border border-[#1E293B] hover:border-brand-primary text-white rounded-lg transition-all text-xs font-semibold"
+              >
+                Reset Simulation
+              </button>
+            </div>
+          </header>
+        )}
+
+        {activeTab === "predictive" && (
+          <header className="flex justify-between items-center border-b border-[#1E293B] pb-4">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-white">Predictive Twin Analytics</h2>
+              <p className="text-xs text-brand-muted">
+                Real-time neuromorphic analytics for LFP Battery Pack{" "}
+                <code className="bg-[#0F172A] border border-[#1E293B] px-1.5 py-0.5 rounded text-brand-primary font-mono text-[10px]">BAT-NEURO-901</code>
+              </p>
+            </div>
             <button
               onClick={handleReset}
-              className="px-4 py-2 border border-brand-primary text-brand-primary hover:bg-brand-accent/20 rounded-lg transition-all text-xs font-semibold"
+              className="px-4 py-2 border border-[#1E293B] hover:border-brand-primary text-white rounded-lg transition-all text-xs font-semibold"
             >
               Reset Simulation
             </button>
-          </div>
-        </header>
+          </header>
+        )}
 
-        <div className="flex md:hidden border border-brand-accent rounded-lg bg-white overflow-hidden">
+        {activeTab === "recommendations" && (
+          <header className="flex justify-between items-center border-b border-[#1E293B] pb-4">
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-white">AI Preservation Strategies</h2>
+              <p className="text-xs text-brand-muted">Next-generation neuromorphic battery management platform</p>
+            </div>
+            <button
+              onClick={handleReset}
+              className="px-4 py-2 border border-[#1E293B] hover:border-brand-primary text-white rounded-lg transition-all text-xs font-semibold"
+            >
+              Reset Simulation
+            </button>
+          </header>
+        )}
+
+        <div className="flex md:hidden border border-[#1E293B] rounded-lg bg-[#0F172A] overflow-hidden">
           {(["realtime", "predictive", "recommendations"] as Tab[]).map((t, i) => (
             <button
               key={t}
@@ -611,151 +694,183 @@ export default function Home() {
           <div className="lg:col-span-2 space-y-6">
             {activeTab === "realtime" && (
               <div className="space-y-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div className="metric-card bg-white border border-brand-primary/20 rounded-2xl p-5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200 shadow-sm animate-card-entry delay-stagger-0">
-                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block mb-1">State of Charge</span>
-                    <div className="flex items-baseline gap-1 mt-2">
-                      <span className="text-3xl font-extrabold tracking-tight text-brand-dark">
-                        {hasAnimatedCounters ? `${soc}%` : `${animatedSoc.toFixed(2)}%`}
-                      </span>
-                    </div>
-                    <div className="w-full bg-brand-accent/50 h-1.5 rounded-full mt-4 overflow-hidden">
-                      <div
-                        className={`bg-brand-primary h-full ${hasAnimatedCounters ? "transition-all duration-500" : ""}`}
-                        style={{ width: `${hasAnimatedCounters ? soc : animatedSoc}%` }}
-                      />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="metric-card bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] transition-all duration-300 shadow-sm animate-card-entry delay-stagger-0 flex flex-col items-center justify-between min-h-[200px]">
+                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block text-center w-full">State of Charge (SOC)</span>
+                    <div className="relative w-32 h-32 flex items-center justify-center mx-auto mt-2">
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="#1E293B" strokeWidth="8" />
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="#38BDF8" strokeWidth="8" strokeDasharray="301.6" strokeDashoffset={301.6 - ((hasAnimatedCounters ? soc : animatedSoc) / 100) * 301.6} strokeLinecap="round" transform="rotate(-90 60 60)" className="transition-all duration-300" />
+                      </svg>
+                      <div className="flex flex-col items-center justify-center space-y-1 z-10">
+                        <svg className="w-5 h-5 text-brand-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a2 2 0 012 2v4a2 2 0 01-2 2H3a2 2 0 01-2-2v-4a2 2 0 012-2z M15 13h1a1 1 0 011 1v2a1 1 0 01-1 1h-1" />
+                        </svg>
+                        <span className="text-xl font-extrabold tracking-tight text-white">{hasAnimatedCounters ? `${soc.toFixed(0)}%` : `${animatedSoc.toFixed(0)}%`}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className={`metric-card bg-white border rounded-2xl p-5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200 shadow-sm animate-card-entry delay-stagger-1 ${temperature > 40 ? "border-danger" : "border-brand-primary/20"}`}>
-                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block mb-1">Cell Temp</span>
-                    <div className="flex items-baseline gap-1 mt-2">
-                      <span className={`text-3xl font-extrabold tracking-tight ${temperature > 40 ? "text-danger" : "text-brand-dark"}`}>
-                        {hasAnimatedCounters ? `${temperature}°C` : `${animatedTemp.toFixed(2)}°C`}
+                  <div className={`metric-card bg-[#0F172A] border rounded-2xl p-6 hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] transition-all duration-300 shadow-sm animate-card-entry delay-stagger-1 flex flex-col items-center justify-between min-h-[200px] ${temperature > 40 ? "border-danger/50" : "border-[#1E293B]"}`}>
+                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block text-center w-full">Cell Temp</span>
+                    <div className="flex flex-col items-center justify-center py-2 space-y-2">
+                      <svg className="w-10 h-10 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19c-1.657 0-3-1.343-3-3V7c0-2.761 2.239-5 5-5s5 2.239 5 5v9c0 1.657-1.343 3-3 3H9z M9 7h6" />
+                      </svg>
+                      <span className={`text-2xl font-extrabold tracking-tight ${temperature > 40 ? "text-danger" : "text-white"}`}>
+                        {hasAnimatedCounters ? `${temperature}°C` : `${animatedTemp.toFixed(1)}°C`}
                       </span>
                     </div>
-                    <span className="text-xs text-brand-muted mt-2 block">
+                    <span className="text-[10px] text-brand-muted text-center block w-full">
                       {runawayMode ? "Critical Rising" : temperature > 32 ? "Warning Threshold" : "Thermal Stable"}
                     </span>
                   </div>
 
-                  <div className="metric-card bg-white border border-brand-primary/20 rounded-2xl p-5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200 shadow-sm animate-card-entry delay-stagger-2">
-                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block mb-1">Terminal Voltage</span>
-                    <div className="flex items-baseline gap-1 mt-2">
-                      <span className="text-3xl font-extrabold tracking-tight text-brand-dark">
-                        {hasAnimatedCounters ? `${voltage}V` : `${animatedVolt.toFixed(3)}V`}
+                  <div className="metric-card bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] transition-all duration-300 shadow-sm animate-card-entry delay-stagger-2 flex flex-col items-center justify-between min-h-[200px]">
+                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block text-center w-full">Voltage</span>
+                    <div className="flex flex-col items-center justify-center py-2 space-y-2">
+                      <svg className="w-10 h-10 text-brand-primary animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span className="text-2xl font-extrabold tracking-tight text-white">
+                        {hasAnimatedCounters ? `${voltage}V` : `${animatedVolt.toFixed(2)}V`}
                       </span>
                     </div>
-                    <span className="text-xs text-brand-muted mt-2 block">Cell limit: 4.2V</span>
-                  </div>
-
-                  <div className="metric-card bg-white border border-brand-primary/20 rounded-2xl p-5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200 shadow-sm animate-card-entry delay-stagger-3">
-                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block mb-1">Current Draw</span>
-                    <div className="flex items-baseline gap-1 mt-2">
-                      <span className={`text-3xl font-extrabold tracking-tight ${current > 0 ? "text-success" : current < 0 ? "text-brand-muted" : "text-brand-dark"}`}>
-                        {hasAnimatedCounters ? (current > 0 ? `+${current}` : current) : (animatedCurr > 0 ? `+${animatedCurr.toFixed(2)}` : animatedCurr.toFixed(2))}A
-                      </span>
-                    </div>
-                    <span className="text-xs text-brand-muted mt-2 block">
-                      {current > 0 ? "Fast Charging" : current < 0 ? "Discharging Load" : "Idle Static"}
-                    </span>
-                  </div>
-
-                  <div className="metric-card bg-white border border-brand-primary/20 rounded-2xl p-5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200 shadow-sm animate-card-entry delay-stagger-4">
-                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block mb-1">Predicted SOH</span>
-                    <div className="flex items-baseline gap-1 mt-2">
-                      <span className="text-3xl font-extrabold tracking-tight text-brand-dark">
-                        {hasAnimatedCounters ? `${soh}%` : `${animatedSoh.toFixed(3)}%`}
-                      </span>
-                    </div>
-                    <span className="text-xs text-brand-muted mt-2 block">Capacity retention</span>
-                  </div>
-
-                  <div className="metric-card bg-white border border-brand-primary/20 rounded-2xl p-5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200 shadow-sm animate-card-entry delay-stagger-5">
-                    <span className="text-xs text-brand-muted font-bold uppercase tracking-wider block mb-1">RUL Projection</span>
-                    <div className="flex items-baseline gap-1 mt-2">
-                      <span className="text-3xl font-extrabold tracking-tight text-brand-dark">
-                        {hasAnimatedCounters ? `${rul} cycles` : `${Math.round(animatedRul)} cycles`}
-                      </span>
-                    </div>
-                    <span className="text-xs text-brand-muted mt-2 block">Cycle life remaining</span>
+                    <span className="text-[10px] text-brand-muted text-center block w-full">Cell limit: 4.2V</span>
                   </div>
                 </div>
 
-                <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm">
-                  <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-brand-dark">
-                    <svg className="w-5 h-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                  <h3 className="text-sm font-bold mb-4 text-white uppercase tracking-wider">Cell Simulation</h3>
+                  <div className="w-full h-[220px] bg-[#080E1A]/40 rounded-xl p-4 flex items-center justify-center relative border border-[#1E293B]/40">
+                    <svg className="w-full h-full" viewBox="0 0 500 200">
+                      <defs>
+                        <filter id="simGlow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feGaussianBlur stdDeviation="6" result="blur" />
+                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                      </defs>
+                      <rect x="40" y="20" width="410" height="150" rx="15" fill="none" stroke="#38BDF8" strokeWidth="2.5" strokeDasharray="5 5" opacity="0.3" />
+                      <path d="M 450 65 A 8 8 0 0 1 458 73 L 458 117 A 8 8 0 0 1 450 125 Z" fill="#38BDF8" opacity="0.6" />
+                      <circle cx="245" cy="95" r="16" fill="#38BDF8" fillOpacity="0.2" stroke="#38BDF8" strokeWidth="2" className="animate-pulse" filter="url(#simGlow)" />
+                      <circle cx="245" cy="95" r="6" fill="#38BDF8" />
+                      
+                      <path d="M 60 45 Q 160 55 229 95" fill="none" stroke="#38BDF8" strokeWidth="1.5" opacity="0.4" strokeDasharray="3 3" />
+                      <path d="M 60 95 Q 160 95 229 95" fill="none" stroke="#38BDF8" strokeWidth="1.5" opacity="0.4" strokeDasharray="3 3" />
+                      <path d="M 60 145 Q 160 135 229 95" fill="none" stroke="#38BDF8" strokeWidth="1.5" opacity="0.4" strokeDasharray="3 3" />
+                      
+                      <path d="M 261 95 Q 340 55 430 45" fill="none" stroke="#10B981" strokeWidth="1.5" opacity="0.4" strokeDasharray="3 3" />
+                      <path d="M 261 95 Q 340 95 430 95" fill="none" stroke="#10B981" strokeWidth="1.5" opacity="0.4" strokeDasharray="3 3" />
+                      <path d="M 261 95 Q 340 135 430 145" fill="none" stroke="#10B981" strokeWidth="1.5" opacity="0.4" strokeDasharray="3 3" />
+                      
+                      <circle cx="120" cy="51" r="3" fill="#38BDF8">
+                        <animate attributeName="cx" from="60" to="229" dur="3s" repeatCount="indefinite" />
+                        <animate attributeName="cy" from="45" to="95" dur="3s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="160" cy="95" r="3" fill="#38BDF8">
+                        <animate attributeName="cx" from="60" to="229" dur="2s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="120" cy="139" r="3" fill="#38BDF8">
+                        <animate attributeName="cx" from="60" to="229" dur="3.5s" repeatCount="indefinite" />
+                        <animate attributeName="cy" from="145" to="95" dur="3.5s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="340" cy="75" r="3" fill="#10B981">
+                        <animate attributeName="cx" from="261" to="430" dur="2.5s" repeatCount="indefinite" />
+                        <animate attributeName="cy" from="95" to="45" dur="2.5s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="360" cy="95" r="3" fill="#10B981">
+                        <animate attributeName="cx" from="261" to="430" dur="1.8s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="340" cy="115" r="3" fill="#10B981">
+                        <animate attributeName="cx" from="261" to="430" dur="3s" repeatCount="indefinite" />
+                        <animate attributeName="cy" from="95" to="145" dur="3s" repeatCount="indefinite" />
+                      </circle>
+
+                      <text x="245" y="45" textAnchor="middle" fill="#38BDF8" fontSize="9" fontFamily="monospace" letterSpacing="1">Neural Activity</text>
+                      <text x="360" y="85" textAnchor="middle" fill="#10B981" fontSize="9" fontFamily="monospace" letterSpacing="1">Energy Flow</text>
+                      <text x="245" y="155" textAnchor="middle" fill="#94A3B8" fontSize="9" fontFamily="monospace" letterSpacing="1">Synaptic Weights</text>
                     </svg>
-                    Cell Simulation Control Center
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="p-4 bg-brand-accent/20 rounded-xl space-y-2 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                      <label className="text-xs text-brand-muted uppercase font-bold tracking-wider">Charging State</label>
-                      <select
-                        value={chargingState}
-                        onChange={(e) => { setChargingState(e.target.value as ChargingState); setRunawayMode(false); }}
-                        disabled={runawayMode}
-                        className="w-full bg-white border border-brand-accent rounded-lg p-2 text-xs font-semibold text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-primary"
-                      >
-                        <option value="charging">Charging</option>
-                        <option value="discharging">Discharging</option>
-                        <option value="idle">Idle</option>
-                      </select>
-                    </div>
+                  </div>
 
-                    <div className="p-4 bg-brand-accent/20 rounded-xl flex items-center justify-between hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                      <div className="space-y-1">
-                        <label className="text-xs text-brand-muted uppercase font-bold tracking-wider block">Fast Charge</label>
-                        <span className="text-xs text-brand-muted block">Boost current to 40A</span>
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <div className="bg-[#080E1A]/60 border border-[#1E293B]/60 p-4 rounded-xl space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Current Draw</span>
+                        <span className={`text-sm font-extrabold tracking-tight ${current > 0 ? "text-success" : current < 0 ? "text-[#38BDF8]" : "text-white"}`}>
+                          {hasAnimatedCounters ? (current > 0 ? `+${current}` : current) : (animatedCurr > 0 ? `+${animatedCurr.toFixed(1)}` : animatedCurr.toFixed(1))}A
+                        </span>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={fastCharge}
-                        onChange={(e) => setFastCharge(e.target.checked)}
-                        disabled={chargingState !== "charging" || runawayMode}
-                        className="h-4 w-4 accent-brand-primary rounded"
-                      />
-                    </div>
-
-                    <div className="p-4 bg-brand-accent/20 rounded-xl flex items-center justify-between hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                      <div className="space-y-1">
-                        <label className="text-xs text-brand-muted uppercase font-bold tracking-wider block">Cap at 80%</label>
-                        <span className="text-xs text-brand-muted block">Preserve cycle lifespan</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Predicted SOH</span>
+                        <span className="text-sm font-extrabold tracking-tight text-white">
+                          {hasAnimatedCounters ? `${soh}%` : `${animatedSoh.toFixed(2)}%`}
+                        </span>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={chargeLimit80}
-                        onChange={(e) => setChargeLimit80(e.target.checked)}
-                        disabled={runawayMode}
-                        className="h-4 w-4 accent-brand-primary rounded"
-                      />
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">RUL Projection</span>
+                        <span className="text-sm font-extrabold tracking-tight text-white">
+                          {hasAnimatedCounters ? `${rul} cycles` : `${Math.round(animatedRul)} cycles`}
+                        </span>
+                      </div>
                     </div>
 
+                    <div className="bg-[#080E1A]/60 border border-[#1E293B]/60 p-4 rounded-xl flex flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Charging State</label>
+                        <select
+                          value={chargingState}
+                          onChange={(e) => { setChargingState(e.target.value as ChargingState); setRunawayMode(false); }}
+                          disabled={runawayMode}
+                          className="bg-[#080E1A] border border-[#1E293B] rounded-lg px-2 py-1 text-[10px] font-semibold text-white focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                        >
+                          <option value="charging">Charging</option>
+                          <option value="discharging">Discharging</option>
+                          <option value="idle">Idle</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-brand-muted font-bold uppercase tracking-wider">Fast Charge (40A)</span>
+                        <input
+                          type="checkbox"
+                          checked={fastCharge}
+                          onChange={(e) => setFastCharge(e.target.checked)}
+                          disabled={chargingState !== "charging" || runawayMode}
+                          className="h-3.5 w-3.5 accent-brand-primary rounded bg-[#080E1A]"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between text-[10px]">
+                        <span className="text-brand-muted font-bold uppercase tracking-wider">Limit Charge 80%</span>
+                        <input
+                          type="checkbox"
+                          checked={chargeLimit80}
+                          onChange={(e) => setChargeLimit80(e.target.checked)}
+                          disabled={runawayMode}
+                          className="h-3.5 w-3.5 accent-brand-primary rounded bg-[#080E1A]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex gap-4">
                     <button
                       onClick={() => setRunawayMode(!runawayMode)}
-                      className={`p-4 rounded-xl font-bold text-xs uppercase flex flex-col justify-center items-center gap-1 transition-all hover:-translate-y-[2px] hover:shadow-lg ${
+                      className={`flex-1 py-3.5 rounded-xl font-bold text-xs uppercase transition-all border ${
                         runawayMode
-                          ? "bg-danger text-white border border-danger shadow-md"
-                          : "bg-brand-accent/20 text-brand-dark hover:bg-brand-accent/40 hover:text-danger"
+                          ? "bg-danger text-white border-danger shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                          : "bg-[#080E1A]/40 text-[#94A3B8] border-[#1E293B] hover:border-danger hover:text-danger"
                       }`}
                     >
-                      <span>{runawayMode ? "Stop Thermal Failure" : "Simulate Runaway"}</span>
-                      <span className="text-xs font-normal lowercase">{runawayMode ? "de-activate runaway" : "force thermal spike"}</span>
+                      {runawayMode ? "Stop Thermal Failure" : "Simulate Runaway"}
                     </button>
                   </div>
                 </div>
 
-                <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm">
+                <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-base font-bold flex items-center gap-2 text-brand-dark">
-                      <svg className="w-5 h-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                      Delta-Modulation Neural Spike Monitor
-                    </h3>
-                    <span className="text-xs text-brand-muted bg-brand-accent/30 px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold">
+                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Delta-Modulation Neural Spike Monitor</h3>
+                    <span className="text-[9px] text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">
                       Spike Rate Dynamic
                     </span>
                   </div>
@@ -766,22 +881,22 @@ export default function Home() {
                       { label: "Current (dI)", key: "current" as keyof SpikeEvent },
                       { label: "Temp (dT)",    key: "temperature" as keyof SpikeEvent },
                     ].map(({ label, key }) => (
-                      <div key={key} className="bg-brand-accent/20 p-3 rounded-lg flex items-center justify-between">
-                        <span className="w-24 font-bold text-brand-muted uppercase text-xs tracking-wider">{label}</span>
+                      <div key={key} className="bg-[#080E1A]/60 border border-[#1E293B]/40 p-3 rounded-lg flex items-center justify-between">
+                        <span className="w-24 font-bold text-brand-muted uppercase text-[10px] tracking-wider">{label}</span>
                         <div className="flex gap-1.5 flex-1 justify-end ml-4 overflow-x-hidden">
                           {spikesHistory.slice(0, 15).map((s, idx) => {
                             const val = s[key] as number;
                             return (
                               <div
                                 key={idx}
-                                className={`h-5 w-5 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
+                                className={`h-5 w-5 rounded-full flex items-center justify-center font-bold text-[10px] transition-all ${
                                   val > 0
                                     ? key === "temperature"
                                       ? "bg-danger text-white animate-bounce"
                                       : "bg-success text-white"
                                     : val < 0
                                     ? "bg-brand-muted text-white"
-                                    : "bg-brand-accent/40 text-brand-muted"
+                                    : "bg-[#1E293B] text-brand-muted"
                                 }`}
                               >
                                 {val > 0 ? "+" : val < 0 ? "−" : ""}
@@ -789,7 +904,7 @@ export default function Home() {
                             );
                           })}
                           {spikesHistory.length === 0 && (
-                            <span className="text-brand-muted text-xs italic">Awaiting delta spikes...</span>
+                            <span className="text-brand-muted text-[10px] italic">Awaiting delta spikes...</span>
                           )}
                         </div>
                       </div>
@@ -801,34 +916,38 @@ export default function Home() {
 
             {activeTab === "predictive" && (
               <div className="space-y-6">
-                <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm">
-                  <h3 className="text-base font-bold mb-4 text-brand-dark">SOH Capacity Degradation Curve</h3>
-                  <div className="w-full h-64 bg-brand-bg rounded-xl p-4 flex items-center justify-center relative border border-brand-accent/40">
+                <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm">
+                  <h3 className="text-sm font-bold mb-4 text-white uppercase tracking-wider">SOH Capacity Degradation Curve</h3>
+                  <div className="w-full h-64 bg-[#080E1A]/40 rounded-xl p-4 flex items-center justify-center relative border border-[#1E293B]/40">
                     <svg className="w-full h-full" viewBox="0 0 500 200">
                       <defs>
                         <clipPath id="chartClip">
                           <rect x="0" y="0" width="0" height="200" className="animate-draw-clip" />
                         </clipPath>
+                        <filter id="neonBlueGlow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feGaussianBlur stdDeviation="4" result="blur" />
+                          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
                       </defs>
 
-                      <line x1="40" y1="10"  x2="40"  y2="170" stroke="#B3CFE5" strokeOpacity="0.4" strokeWidth="1" />
-                      <line x1="40" y1="170" x2="480" y2="170" stroke="#B3CFE5" strokeOpacity="0.4" strokeWidth="1" />
-                      <line x1="40" y1="90"  x2="480" y2="90"  stroke="#B3CFE5" strokeOpacity="0.4" strokeWidth="1" strokeDasharray="4" />
+                      <line x1="40" y1="10"  x2="40"  y2="170" stroke="#1E293B" strokeWidth="1" />
+                      <line x1="40" y1="170" x2="480" y2="170" stroke="#1E293B" strokeWidth="1" />
+                      <line x1="40" y1="90"  x2="480" y2="90"  stroke="#1E293B" strokeWidth="1" strokeDasharray="4" />
 
-                      <text x="15" y="15"  fill="#4A7FA7" fontSize="9" fontFamily="monospace">100%</text>
-                      <text x="15" y="90"  fill="#4A7FA7" fontSize="9" fontFamily="monospace">85%</text>
-                      <text x="15" y="170" fill="#4A7FA7" fontSize="9" fontFamily="monospace">70%</text>
-                      <text x="40"  y="185" fill="#4A7FA7" fontSize="9" fontFamily="monospace">0 cycles</text>
-                      <text x="260" y="185" fill="#4A7FA7" fontSize="9" fontFamily="monospace">750 cycles</text>
-                      <text x="440" y="185" fill="#4A7FA7" fontSize="9" fontFamily="monospace">1500 cycles</text>
+                      <text x="15" y="15"  fill="#94A3B8" fontSize="8" fontFamily="monospace">100%</text>
+                      <text x="15" y="90"  fill="#94A3B8" fontSize="8" fontFamily="monospace">85%</text>
+                      <text x="15" y="170" fill="#94A3B8" fontSize="8" fontFamily="monospace">70%</text>
+                      <text x="40"  y="182" fill="#94A3B8" fontSize="8" fontFamily="monospace">0 cycles</text>
+                      <text x="260" y="182" fill="#94A3B8" fontSize="8" fontFamily="monospace">750 cycles</text>
+                      <text x="440" y="182" fill="#94A3B8" fontSize="8" fontFamily="monospace">1500 cycles</text>
 
                       <g clipPath="url(#chartClip)">
                         {connectToAPI && projectedDecayCurve.length > 0 ? (
-                          <path d={getBackendDecayPath()} fill="none" stroke="#1A3D63" strokeWidth="3.5" strokeLinecap="round" />
+                          <path d={getBackendDecayPath()} fill="none" stroke="#38BDF8" strokeWidth="3" strokeLinecap="round" filter="url(#neonBlueGlow)" />
                         ) : (
                           <>
-                            <path d="M 40 15 Q 260 90 480 150" fill="none" stroke="#1A3D63" strokeWidth="3" strokeLinecap="round" />
-                            <path d="M 40 15 Q 200 110 480 178" fill="none" stroke="#c0392b" strokeWidth="2" strokeLinecap="round" strokeDasharray="4" />
+                            <path d="M 40 15 Q 260 90 480 150" fill="none" stroke="#38BDF8" strokeWidth="3.5" strokeLinecap="round" filter="url(#neonBlueGlow)" />
+                            <path d="M 40 15 Q 200 110 480 178" fill="none" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="5" />
                           </>
                         )}
                       </g>
@@ -837,62 +956,65 @@ export default function Home() {
                         <circle
                           cx={40 + (chargeCycles / 1500) * 440}
                           cy={15 + (100 - soh) * 4.5}
-                          r="6" fill="#4A7FA7"
+                          r="6" fill="#38BDF8" filter="url(#neonBlueGlow)"
                         />
                       )}
                     </svg>
 
-                    <div className="absolute top-4 right-4 flex gap-4 text-xs font-semibold">
+                    <div className="absolute top-4 right-4 flex gap-4 text-[9px] font-semibold uppercase tracking-wider">
                       <span className="flex items-center gap-1.5 text-brand-muted">
-                        <span className="h-2 w-2 rounded-full bg-brand-primary" />Normal degradation
+                        <span className="h-2 w-2 rounded-full bg-brand-primary" />Actual degradation
                       </span>
                       <span className="flex items-center gap-1.5 text-brand-muted">
-                        <span className="h-2 w-2 rounded-full bg-danger" />Fast charge accel.
+                        <span className="h-2 w-2 rounded-full bg-danger" />Predicted degradation (Fast Charge)
                       </span>
                       <span className="flex items-center gap-1.5 text-brand-muted">
-                        <span className="h-2.5 w-2.5 rounded-full bg-brand-muted" />Current status
+                        <span className="h-2 w-2 rounded-full bg-brand-muted" />Current status
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm">
-                  <h3 className="text-base font-bold mb-4 text-brand-dark">Digital Twin Calibration State</h3>
+                <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm">
+                  <h3 className="text-sm font-bold mb-4 text-white uppercase tracking-wider">Digital Twin Calibration State</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-brand-accent/20 p-4 rounded-xl space-y-3 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                      <h4 className="text-xs font-bold uppercase text-brand-primary tracking-wider">Physical Cell</h4>
+                    <div className="bg-[#080E1A]/40 border border-[#1E293B] p-4 rounded-xl space-y-3 hover:border-brand-primary/40 transition-all duration-300">
+                      <h4 className="text-[10px] font-bold uppercase text-brand-primary tracking-wider">Physical Cell</h4>
                       <div>
-                        <span className="text-xs text-brand-muted block">Measured Temp</span>
-                        <span className="text-lg font-bold text-brand-dark">{temperature}°C</span>
+                        <span className="text-[10px] text-brand-muted block">Measured Temp</span>
+                        <span className="text-lg font-bold text-white">{temperature}°C</span>
                       </div>
                       <div>
-                        <span className="text-xs text-brand-muted block">Measured Voltage</span>
-                        <span className="text-lg font-bold text-brand-dark">{voltage}V</span>
-                      </div>
-                    </div>
-
-                    <div className="bg-brand-accent/20 p-4 rounded-xl space-y-3 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                      <h4 className="text-xs font-bold uppercase text-brand-muted tracking-wider">Twin (Ideal Model)</h4>
-                      <div>
-                        <span className="text-xs text-brand-muted block">Model Temp</span>
-                        <span className="text-lg font-bold text-brand-dark">{twinTemp.toFixed(2)}°C</span>
-                      </div>
-                      <div>
-                        <span className="text-xs text-brand-muted block">Model Voltage</span>
-                        <span className="text-lg font-bold text-brand-dark">{twinVoltage.toFixed(3)}V</span>
+                        <span className="text-[10px] text-brand-muted block">Measured Voltage</span>
+                        <span className="text-lg font-bold text-white">{voltage}V</span>
                       </div>
                     </div>
 
-                    <div className="bg-brand-accent/20 p-4 rounded-xl space-y-3 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                      <h4 className="text-xs font-bold uppercase text-brand-muted tracking-wider">Model Drift Delta</h4>
+                    <div className="bg-[#080E1A]/40 border border-[#1E293B] p-4 rounded-xl space-y-3 hover:border-brand-primary/40 transition-all duration-300">
+                      <h4 className="text-[10px] font-bold uppercase text-brand-muted tracking-wider">Twin (Ideal Model)</h4>
                       <div>
-                        <span className="text-xs text-brand-muted block">Thermal Delta</span>
-                        <span className={`text-lg font-bold ${Math.abs(temperature - twinTemp) > 2.0 ? "text-danger" : "text-success"}`}>
+                        <span className="text-[10px] text-brand-muted block">Model Temp</span>
+                        <span className="text-lg font-bold text-white">{twinTemp.toFixed(2)}°C</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-brand-muted block">Model Voltage</span>
+                        <span className="text-lg font-bold text-white">{twinVoltage.toFixed(3)}V</span>
+                      </div>
+                    </div>
+
+                    <div className={`bg-[#080E1A]/40 border p-4 rounded-xl space-y-3 hover:border-brand-primary/40 transition-all duration-300 ${Math.abs(temperature - twinTemp) > 2.0 ? "border-danger/40" : "border-[#1E293B]"}`}>
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-[10px] font-bold uppercase text-brand-muted tracking-wider">Model Drift Delta</h4>
+                        <span className={`h-2 w-2 rounded-full ${Math.abs(temperature - twinTemp) > 2.0 ? "bg-danger animate-pulse" : "bg-success"}`} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-brand-muted block">Thermal Delta</span>
+                        <span className={`text-lg font-bold ${Math.abs(temperature - twinTemp) > 2.0 ? "text-danger" : "text-white"}`}>
                           {Math.abs(temperature - twinTemp).toFixed(2)}°C
                         </span>
                       </div>
                       <div>
-                        <span className="text-xs text-brand-muted block">Voltage Delta</span>
+                        <span className="text-[10px] text-brand-muted block">Voltage Delta</span>
                         <span className="text-lg font-bold text-success">{Math.abs(voltage - twinVoltage).toFixed(3)}V</span>
                       </div>
                     </div>
@@ -903,9 +1025,59 @@ export default function Home() {
 
             {activeTab === "recommendations" && (
               <div className="space-y-6">
-                <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm space-y-4">
-                  <h3 className="text-base font-bold text-brand-dark">Recommended preservation strategies</h3>
-                  <div className="space-y-3">
+                <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm space-y-4">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">Recommended Preservation Strategies</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-[#080E1A]/40 border border-[#1E293B] p-5 rounded-xl space-y-4 hover:border-brand-primary/40 transition-all flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Thermal Management</span>
+                          <span className={`h-2.5 w-2.5 rounded-full ${temperature > 35.0 ? "bg-danger animate-pulse" : "bg-success"}`} />
+                        </div>
+                        <div className="text-xs text-white">Target Temp: <strong className="font-semibold">&lt;30°C</strong></div>
+                        <div className="text-[10px] text-brand-muted leading-relaxed">
+                          {temperature > 35.0 ? "Active cooling triggers recommended due to temperature anomalies." : "Thermal limits stable. Active cooling idle."}
+                        </div>
+                      </div>
+                      <button className="w-full py-2 bg-[#0F172A] border border-[#1E293B] hover:border-danger hover:text-danger text-white text-[10px] font-bold uppercase rounded-lg transition-all">
+                        Activate Cooling
+                      </button>
+                    </div>
+
+                    <div className="bg-[#080E1A]/40 border border-[#1E293B] p-5 rounded-xl space-y-4 hover:border-brand-primary/40 transition-all flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Cycle Optimization</span>
+                          <span className="h-2.5 w-2.5 rounded-full bg-success" />
+                        </div>
+                        <div className="text-xs text-white">Charge Limit: <strong className="font-semibold">80%</strong></div>
+                        <div className="text-[10px] text-brand-muted leading-relaxed">
+                          Applying an 80% charge limit protects cycle lifespan from degradation stresses.
+                        </div>
+                      </div>
+                      <button className="w-full py-2 bg-[#0F172A] border border-[#1E293B] hover:border-success hover:text-success text-white text-[10px] font-bold uppercase rounded-lg transition-all">
+                        Adjust Profile
+                      </button>
+                    </div>
+
+                    <div className="bg-[#080E1A]/40 border border-[#1E293B] p-5 rounded-xl space-y-4 hover:border-brand-primary/40 transition-all flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-brand-muted uppercase font-bold tracking-wider">Stress Reduction</span>
+                          <span className="h-2.5 w-2.5 rounded-full bg-brand-primary" />
+                        </div>
+                        <div className="text-xs text-white">Discharge Rate: <strong className="font-semibold">0.5C</strong></div>
+                        <div className="text-[10px] text-brand-muted leading-relaxed">
+                          Limits active anode polarization stresses during constant current draw.
+                        </div>
+                      </div>
+                      <button className="w-full py-2 bg-[#0F172A] border border-[#1E293B] hover:border-brand-primary hover:text-brand-primary text-white text-[10px] font-bold uppercase rounded-lg transition-all">
+                        Enable Limiter
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-[#1E293B]">
                     {connectToAPI ? (
                       <>
                         {backendWarnings.map((w, i) => (
@@ -917,16 +1089,13 @@ export default function Home() {
                           </div>
                         ))}
                         {backendRecommendations.map((r, i) => (
-                          <div key={i} className="flex gap-3 bg-brand-accent/20 text-brand-dark p-4 rounded-xl text-xs">
+                          <div key={i} className="flex gap-3 bg-[#0F172A] border border-[#1E293B] text-white p-4 rounded-xl text-xs">
                             <svg className="w-5 h-5 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <div><strong className="block font-semibold mb-1">Preservation Suggestion</strong>{r}</div>
                           </div>
                         ))}
-                        {backendRecommendations.length === 0 && backendWarnings.length === 0 && (
-                          <span className="text-xs text-brand-muted">Awaiting backend analysis...</span>
-                        )}
                       </>
                     ) : (
                       <>
@@ -941,44 +1110,21 @@ export default function Home() {
                             </div>
                           </div>
                         )}
-
-                        <div className="flex gap-3 bg-brand-accent/20 text-brand-dark p-4 rounded-xl text-xs hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                          <svg className="w-5 h-5 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <div>
-                            <strong className="block font-semibold mb-1">Charge Limiting (80% SOC cap)</strong>
-                            Enabling the 80% charge limit is projected to extend RUL from {rul} to {rul + 450} cycles, slowing active cathode erosion.
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3 bg-brand-accent/20 text-brand-dark p-4 rounded-xl text-xs hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
-                          <svg className="w-5 h-5 text-brand-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <div>
-                            <strong className="block font-semibold mb-1">Constant-Voltage absorption phase optimize</strong>
-                            High-current charging sustained for {chargeCycles > 200 ? "42" : "28"} cycles. Transitioning to CV mode earlier reduces grid lattice stresses.
-                          </div>
-                        </div>
                       </>
                     )}
                   </div>
                 </div>
 
-                <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm">
-                  <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-brand-dark">
-                    <svg className="w-5 h-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    AI Explorer: Neuromorphic Physics Portal
+                <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm">
+                  <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-white uppercase tracking-wider">
+                    AI Explorer
                   </h3>
                   <div className="space-y-3">
                     {qaData.map((qa, index) => (
-                      <div key={index} className="border border-brand-accent rounded-xl overflow-hidden hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
+                      <div key={index} className="border border-[#1E293B] rounded-xl overflow-hidden hover:border-brand-primary/40 transition-all duration-300">
                         <button
                           onClick={() => setSelectedQA(selectedQA === index ? null : index)}
-                          className="w-full flex justify-between items-center p-4 text-left font-semibold text-xs transition-all hover:bg-brand-accent/20 text-brand-dark bg-brand-accent/10"
+                          className="w-full flex justify-between items-center p-4 text-left font-semibold text-xs transition-all hover:bg-[#080E1A]/40 text-white bg-[#080E1A]/20"
                         >
                           <span>{qa.q}</span>
                           <svg className={`w-4 h-4 text-brand-muted transition-transform duration-300 ${selectedQA === index ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -986,7 +1132,7 @@ export default function Home() {
                           </svg>
                         </button>
                         {selectedQA === index && (
-                          <div className="p-4 bg-white border-t border-brand-accent text-xs leading-relaxed text-brand-muted">
+                          <div className="p-4 bg-[#080E1A]/60 border-t border-[#1E293B] text-xs leading-relaxed text-brand-muted">
                             {qa.a}
                           </div>
                         )}
@@ -999,21 +1145,18 @@ export default function Home() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-bold flex items-center gap-2 text-brand-dark">
-                <svg className="w-5 h-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+            <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold flex items-center gap-2 text-white uppercase tracking-wider">
                 LIF Neuron State Monitor
               </h3>
 
               <div className="space-y-4 text-xs">
                 <div className="space-y-2">
-                  <div className="flex justify-between font-mono">
+                  <div className="flex justify-between font-mono text-[10px]">
                     <span className="text-brand-muted">Membrane Potential (V_m):</span>
-                    <span className="font-bold text-brand-dark">{membranePotential} / {vThreshold} V</span>
+                    <span className="font-bold text-white">{membranePotential} / {vThreshold} V</span>
                   </div>
-                  <div className="w-full bg-brand-accent/50 h-3 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#080E1A] h-2.5 rounded-full overflow-hidden border border-[#1E293B]">
                     <div
                       className={`h-full ${hasAnimatedCounters ? "transition-all duration-300" : ""} ${
                         membranePotential > 0.7 ? "bg-danger" : membranePotential > 0.4 ? "bg-brand-muted" : "bg-brand-primary"
@@ -1023,7 +1166,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="bg-brand-accent/20 rounded-xl p-3 space-y-1 font-mono text-xs">
+                <div className="bg-[#080E1A]/40 border border-[#1E293B] rounded-xl p-3.5 space-y-1.5 font-mono text-[10px]">
                   {[
                     ["Rest Potential:", `${vRest}V`],
                     ["Firing Threshold:", `${vThreshold}V`],
@@ -1033,25 +1176,25 @@ export default function Home() {
                   ].map(([label, val]) => (
                     <div key={label} className="flex justify-between">
                       <span className="text-brand-muted">{label}</span>
-                      <span className="text-brand-dark font-semibold">{val}</span>
+                      <span className="text-white font-semibold">{val}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border border-brand-primary/20 rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-bold text-brand-dark">SNN Alert &amp; Event Feed</h3>
+            <div className="bg-[#0F172A] border border-[#1E293B] rounded-2xl p-6 shadow-sm space-y-4">
+              <h3 className="text-sm font-bold text-white uppercase tracking-wider">SNN Alert &amp; Event Feed</h3>
               <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
                 {alerts.map((alert) => (
                   <div
                     key={alert.id}
-                    className={`p-3 rounded-xl border text-xs space-y-1.5 transition-all duration-300 ${
+                    className={`p-3.5 rounded-xl border text-[10px] space-y-1.5 transition-all duration-300 ${
                       alert.type === "danger"
                         ? "bg-danger/10 border-danger/20 text-danger"
                         : alert.type === "warning"
-                        ? "bg-brand-accent/30 border-brand-accent text-brand-primary"
-                        : "bg-brand-accent/20 border-brand-accent text-brand-muted"
+                        ? "bg-brand-primary/10 border-brand-primary/20 text-brand-primary"
+                        : "bg-[#080E1A]/40 border-[#1E293B] text-brand-muted"
                     }`}
                   >
                     <div className="flex justify-between items-center font-bold">
