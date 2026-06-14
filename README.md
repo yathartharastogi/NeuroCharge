@@ -33,16 +33,16 @@ NeuroCharge is a brain-inspired, deep-tech neuromorphic battery management and E
 ## User Interface Preview
 
 ### Landing Page
-![Landing Page](assets/landing_page.png)
+![Landing Page](assets/landing_page_v2.png)
 
 ### Real-Time Live Monitor Dashboard
-![Real-Time Live Monitor](assets/live_monitor.png)
+![Real-Time Live Monitor](assets/live_monitor_v2.png)
 
 ### Predictive Twin Analysis
-![Predictive Twin Analysis](assets/predictive_twin.png)
+![Predictive Twin Analysis](assets/predictive_twin_v2.png)
 
 ### AI Preservation Strategies
-![AI Preservation Strategies](assets/ai_preservation.png)
+![AI Preservation Strategies](assets/ai_preservation_v2.png)
 
 ---
 
