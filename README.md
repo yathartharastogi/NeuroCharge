@@ -156,5 +156,6 @@ The Leaky Integrate-and-Fire (LIF) network evaluates signals using the following
 *   **Temperature Spike Weight ($w_T$):** $+0.55\text{V}$ per thermal anomaly event.
 *   **Current Spike Weight ($w_I$):** $+0.25\text{V}$ per current spike event.
 
+--- 
 
 MADE WITH 🤍 BY TEAM CTRL ALT ELITE
