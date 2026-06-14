@@ -50,6 +50,23 @@ export default function Home() {
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (view !== "landing") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    const elements = document.querySelectorAll(".scroll-reveal");
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [view]);
+
   const [chargingState, setChargingState] = useState<ChargingState>("charging");
   const [fastCharge, setFastCharge] = useState(false);
   const [chargeLimit80, setChargeLimit80] = useState(false);
@@ -381,102 +398,134 @@ export default function Home() {
     },
   ];
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   if (view === "landing") {
     return (
-      <div className="flex flex-col min-h-screen bg-[#080E1A] text-white relative overflow-hidden">
+      <div className="flex flex-col min-h-screen bg-[#080E1A] text-white relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(56,189,248,0.08)_0%,transparent_40%),radial-gradient(circle_at_80%_60%,rgba(239,68,68,0.05)_0%,transparent_40%)] pointer-events-none" />
 
-        <header className="sticky top-0 z-50 w-full border-b border-[#1E293B] bg-[#080E1A]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+        <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-[#1E293B] bg-[#080E1A]/90 backdrop-blur-md px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView("landing")}>
-            <div className="h-8 w-8 rounded-full bg-[#1E293B] border border-brand-primary flex items-center justify-center text-brand-primary font-bold text-xs tracking-wider shadow">
+            <div className="h-8 w-8 rounded-full bg-[#1E293B] border border-brand-primary flex items-center justify-center text-brand-primary font-bold text-xs tracking-wider">
               NC
             </div>
             <div>
-              <h1 className="font-bold text-sm leading-tight tracking-tight text-white">NeuroCharge</h1>
-              <span className="text-[10px] text-brand-muted font-medium uppercase tracking-widest block">SNN Platform</span>
+              <h1 className="font-bold text-sm leading-tight tracking-tight text-white uppercase">NeuroCharge SNN PLATFORM</h1>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-xs font-medium text-brand-muted">
-            <span className="hover:text-white cursor-pointer transition-all">Features</span>
-            <span className="hover:text-white cursor-pointer transition-all">Technology</span>
-            <span className="hover:text-white cursor-pointer transition-all">About</span>
-            <span className="hover:text-white cursor-pointer transition-all">Contact</span>
+          <div className="hidden md:flex items-center gap-8 text-xs font-semibold text-[#94A3B8]">
+            <span onClick={() => scrollToSection("features")} className="hover:text-[#38BDF8] cursor-pointer transition-all">Features</span>
+            <span onClick={() => scrollToSection("technology")} className="hover:text-[#38BDF8] cursor-pointer transition-all">Technology</span>
+            <span onClick={() => scrollToSection("about")} className="hover:text-[#38BDF8] cursor-pointer transition-all">About</span>
           </div>
           <button
             onClick={() => setView("dashboard")}
-            className="px-5 py-2 border border-brand-primary/50 text-white hover:border-brand-primary text-xs font-semibold rounded-lg transition-all flex items-center gap-2 cursor-pointer shadow-[0_0_10px_rgba(56,189,248,0.1)]"
+            className="px-5 py-2.5 bg-[#0F172A] border border-[#1E293B] hover:border-[#38BDF8] text-white hover:text-[#38BDF8] text-xs font-bold uppercase rounded-lg transition-all shadow-[0_0_10px_rgba(56,189,248,0.05)] cursor-pointer"
           >
-            Enter Dashboard
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            Enter Dashboard &gt;
           </button>
         </header>
 
-        <main className="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto px-6 py-16 text-center space-y-8 z-10">
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-none text-white max-w-3xl animate-fade-up delay-100 start-hidden">
-            The Future of Battery Intelligence
-          </h2>
+        <main className="flex-1 max-w-5xl mx-auto px-6 pt-32 pb-16 space-y-24 z-10 w-full">
+          <section className="flex flex-col items-center justify-center text-center space-y-8 min-h-[60vh]">
+            <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-none text-white uppercase max-w-3xl animate-fade-up delay-100 start-hidden">
+              The Future of Battery Intelligence
+            </h2>
 
-          <p className="text-sm md:text-base text-brand-muted max-w-2xl leading-relaxed animate-fade-up delay-200 start-hidden">
-            Next-generation neuromorphic battery management platform.
-            <br />
-            Advanced SNN-driven analytics for optimized performance and longevity.
-          </p>
+            <p className="text-sm md:text-base text-brand-muted max-w-2xl leading-relaxed animate-fade-up delay-200 start-hidden">
+              Next-generation neuromorphic battery management platform. Advanced SNN-driven analytics for optimized performance and longevity.
+            </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-16 animate-fade-up delay-300 start-hidden">
-            <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] transition-all duration-300 space-y-4 flex flex-col items-center">
-              <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
-                <svg className="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+            <div className="animate-fade-up delay-300 start-hidden pt-4">
+              <button
+                onClick={() => setView("dashboard")}
+                className="px-8 py-3.5 bg-brand-bg border border-brand-primary text-white hover:bg-[#0F172A] text-sm font-bold uppercase rounded-lg transition-all shadow-[0_0_15px_rgba(56,189,248,0.2)] hover:scale-[1.02] cursor-pointer"
+              >
+                Enter Platform &gt;
+              </button>
+            </div>
+          </section>
+
+          <section id="features" className="scroll-reveal space-y-8 pt-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-extrabold tracking-wider uppercase text-white">Features</h3>
+              <div className="h-1 w-12 bg-[#38BDF8] mx-auto mt-3" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+              <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] hover:-translate-y-1.5 transition-all duration-300 space-y-4 flex flex-col items-center">
+                <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
+                  <svg className="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-base text-white">Live Monitor</h4>
+                <p className="text-xs text-brand-muted leading-relaxed">
+                  Real-time SNN monitoring for voltage, temperature, and current spike detection.
+                </p>
               </div>
-              <h3 className="font-bold text-base text-white">Live Monitor</h3>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                Real-time SNN monitoring for voltage, temperature, and current spike detection.
+
+              <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] hover:-translate-y-1.5 transition-all duration-300 space-y-4 flex flex-col items-center">
+                <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-base text-white">Predictive Twin</h4>
+                <p className="text-xs text-brand-muted leading-relaxed">
+                  AI-driven degradation modeling and simulation for precise lifetime prediction.
+                </p>
+              </div>
+
+              <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] hover:-translate-y-1.5 transition-all duration-300 space-y-4 flex flex-col items-center">
+                <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-base text-white">AI Preservation</h4>
+                <p className="text-xs text-brand-muted leading-relaxed">
+                  Smart SNN algorithms for proactive thermal management and charge optimization.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section id="technology" className="scroll-reveal space-y-8 pt-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-extrabold tracking-wider uppercase text-white">Understanding EV Battery Intelligence</h3>
+              <div className="h-1 w-12 bg-[#38BDF8] mx-auto mt-3" />
+            </div>
+            <div className="max-w-3xl mx-auto space-y-6 text-sm text-[#94A3B8] leading-relaxed text-center">
+              <p>
+                Spiking Neural Networks (SNNs) represent the vanguard of neuromorphic computing, mimicking the biology of human neural pathways to process battery sensor inputs as temporal spike events. By translating continuous telemetry—voltage shifts, current draws, and thermal spikes—into discrete delta-modulated triggers, the SNN model operates with near-zero latency. This stateful execution allows the system to run complex predictive algorithms at a fraction of the computational footprint required by traditional state-of-health processors.
+              </p>
+              <p>
+                This stateful monitoring is crucial for early anomaly detection, especially in high-stress charging cycles. By continuously integrating temporal spikes, the Leaky Integrate-and-Fire model identifies thermodynamic anomalies in under a second, stopping potential thermal runaway events before they escalate. Furthermore, these real-time calibration loops align the battery's active output with its digital twin, dynamically adapting charge limits and reducing grid lattice stresses to extend cycle longevity and vehicle health.
               </p>
             </div>
+          </section>
 
-            <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] transition-all duration-300 space-y-4 flex flex-col items-center">
-              <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-base text-white">Predictive Twin</h3>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                AI-driven degradation modeling and simulation for precise lifetime prediction.
+          <section id="about" className="scroll-reveal space-y-8 pt-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-extrabold tracking-wider uppercase text-white">About NeuroCharge</h3>
+              <div className="h-1 w-12 bg-[#38BDF8] mx-auto mt-3" />
+            </div>
+            <div className="max-w-3xl mx-auto space-y-6 text-sm text-[#94A3B8] leading-relaxed text-center">
+              <p>
+                NeuroCharge was founded on the mission to revolutionize energy storage analytics through neuromorphic computing. By bridging the gap between hardware battery management capabilities and stateful artificial intelligence, our platform delivers real-time prognostic safety checks and lifespan optimizations. We empower EV fleets, energy providers, and grid operators with deep-tech, SNN-driven insights to maximize efficiency, accelerate electrification, and secure long-term battery cell reliability.
               </p>
             </div>
-
-            <div className="bg-[#0F172A] border border-[#1E293B] p-8 rounded-2xl text-center hover:border-brand-primary/50 hover:shadow-[0_0_20px_rgba(56,189,248,0.05)] transition-all duration-300 space-y-4 flex flex-col items-center">
-              <div className="h-12 w-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center border border-brand-primary/20">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="font-bold text-base text-white">AI Preservation</h3>
-              <p className="text-xs text-brand-muted leading-relaxed">
-                Smart SNN algorithms for proactive thermal management and charge optimization.
-              </p>
-            </div>
-          </div>
-
-          <div className="animate-fade-up delay-400 start-hidden pt-8">
-            <button
-              onClick={() => setView("dashboard")}
-              className="px-8 py-3.5 bg-brand-bg border border-brand-primary text-white hover:bg-[#0F172A] text-sm font-semibold rounded-lg transition-all shadow-[0_0_15px_rgba(56,189,248,0.2)] flex items-center gap-2 cursor-pointer"
-            >
-              Enter Platform
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
+          </section>
         </main>
 
         <footer className="w-full border-t border-[#1E293B] py-6 text-center text-[10px] text-brand-muted font-medium uppercase tracking-widest z-10">
-          &copy; {new Date().getFullYear()} NeuroCharge. All rights reserved.
+          &copy; {new Date().getFullYear()} NEUROCHARGE. ALL RIGHTS RESERVED.
         </footer>
       </div>
     );
