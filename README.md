@@ -1,6 +1,17 @@
 # NeuroCharge
 
+## Problem Statement
+
+Develop a brain-inspired model that learns real-time charging and thermal patterns of EV batteries to optimize charge cycles, predict degradation, and extend battery life.
+
+### Our Solution
+
+NeuroCharge addresses this challenge through a neuromorphic battery intelligence platform that combines Spiking Neural Networks (SNNs), Digital Twin simulation, and predictive degradation analytics. By continuously learning from battery telemetry streams, NeuroCharge detects thermal anomalies in real time, estimates future battery health, and provides actionable insights to maximize battery longevity, safety, and charging efficiency.
+
+---
+
 NeuroCharge is a brain-inspired, deep-tech neuromorphic battery management and EV analytics platform. It implements stateful **Spiking Neural Network (SNN)** processing on battery cell telemetry to detect thermal runaway anomalies in under a second, while synchronizing physical parameters against a real-time **Digital Twin** ideal model and projecting capacity degradation using LSTM intelligence.
+
 
 ---
 
