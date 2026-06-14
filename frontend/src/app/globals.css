@@ -1,87 +1,82 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f7f3ee;
-  --foreground: #22221f;
-  --card: #ffffff;
-  --card-border: #e6e0d8;
-  --primary: #4e5347;
-  --primary-foreground: #f7f3ee;
-  --accent: #ca8a4b;
-  --danger: #b54a37;
-  --success: #3c734b;
-  --muted: #79756c;
-  --muted-light: #ece7df;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #141412;
-    --foreground: #f2efe9;
-    --card: #1b1b19;
-    --card-border: #2d2d2a;
-    --primary: #8da482;
-    --primary-foreground: #141412;
-    --accent: #dca06e;
-    --danger: #cc604c;
-    --success: #5aa66d;
-    --muted: #848076;
-    --muted-light: #262623;
-  }
-}
+/*
+  NeuroCharge — Deep-Tech Neuromorphic Blue Palette
+  brand-bg:      #F6FAFD  cool ice tint
+  brand-dark:    #0A1931  midnight navy — headings / bold values
+  brand-primary: #1A3D63  deep navy — buttons / active nav / chart lines
+  brand-muted:   #4A7FA7  steel blue — subtext / inactive states
+  brand-accent:  #B3CFE5  soft blue — progress tracks / badge fills
+*/
 
 @theme {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-border: var(--card-border);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-accent: var(--accent);
-  --color-danger: var(--danger);
-  --color-success: var(--success);
-  --color-muted: var(--muted);
-  --color-muted-light: var(--muted-light);
+  --color-brand-bg:      #F6FAFD;
+  --color-brand-dark:    #0A1931;
+  --color-brand-primary: #1A3D63;
+  --color-brand-muted:   #4A7FA7;
+  --color-brand-accent:  #B3CFE5;
+  --color-danger:        #c0392b;
+  --color-success:       #1a7a4a;
 }
 
+/* ── Base ─────────────────────────────────────────────────────── */
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: #F6FAFD;
+  color: #0A1931;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  background-image:
+    radial-gradient(ellipse 100% 55% at 80% -10%, rgba(26,61,99,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 10% 100%, rgba(179,207,229,0.12) 0%, transparent 55%);
+  background-attachment: fixed;
 }
 
+/* ── Animations ──────────────────────────────────────────────── */
 @keyframes fadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.start-hidden { opacity: 0; }
+
+@keyframes drawPath {
+  to { stroke-dashoffset: 0; }
+}
+.animate-draw-path {
+  animation: drawPath 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.animate-fade-up {
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes drawClip {
+  from { width: 0px; }
+  to   { width: 500px; }
+}
+.animate-draw-clip {
+  animation: drawClip 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.delay-100 {
-  animation-delay: 100ms;
+@keyframes cardEntry {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-.delay-200 {
-  animation-delay: 200ms;
-}
-
-.delay-300 {
-  animation-delay: 300ms;
-}
-
-.delay-400 {
-  animation-delay: 400ms;
-}
-
-.start-hidden {
+.animate-card-entry {
+  animation: cardEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   opacity: 0;
 }
+.delay-stagger-0 { animation-delay: 0ms; }
+.delay-stagger-1 { animation-delay: 60ms; }
+.delay-stagger-2 { animation-delay: 120ms; }
+.delay-stagger-3 { animation-delay: 180ms; }
+.delay-stagger-4 { animation-delay: 240ms; }
+.delay-stagger-5 { animation-delay: 300ms; }
 
+/* ── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar             { width: 6px; }
+::-webkit-scrollbar-track       { background: #F6FAFD; }
+::-webkit-scrollbar-thumb       { background: #B3CFE5; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #4A7FA7; }
+
+/* ── Selection ───────────────────────────────────────────────── */
+::selection { background: rgba(179,207,229,0.45); color: #0A1931; }
